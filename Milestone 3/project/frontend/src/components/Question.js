@@ -5,6 +5,7 @@ import Moment from 'react-moment';
 import User from './User';
 import Vote from "./Vote";
 import { Grid, Container } from "@mui/material";
+import Comments from './Comments'
 
 const Question = (props) => {
 
@@ -89,8 +90,7 @@ const Question = (props) => {
 
 
           </Grid>
-
-
+          {/* <Comments id={postid} userid={userid} isAuth={isAuth}/> */}
       </div>
     ))}
     </div>);

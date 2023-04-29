@@ -4,7 +4,6 @@ import User from './User';
 import axios from "axios";
 import { Grid } from "@mui/material";
 import Vote from "./Vote";
-// import Comments from './Comments';
 
 const Answer = ({ ans, userid, isAuth }) => {
 
@@ -28,7 +27,7 @@ const Answer = ({ ans, userid, isAuth }) => {
         <Grid item xs={12} md={3}>
           < User id={ans.owner_user_id} creation_date={ans.creation_date} />
         </Grid>
-        {/* <Comments id={ans.id} userid={userid} isAuth={isAuth}/> */}
+
       </Grid>
     </li>);
 }

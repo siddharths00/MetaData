@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		},
+		{
+			"path": "../../../../../cqadb_schema"
+		},
+		{
+			"path": "../../../../mui-tutorial"
+		}
+	],
+	"settings": {}
+}

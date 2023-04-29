@@ -11,7 +11,7 @@ client.connect(function(err) {
   console.log("Connected!");
 });
 
-client.query('SELECT * from users limit 1', (err, res) => {
+client.query('SELECT * from users limit 3', (err, res) => {
     var {rows} = res
     console.log(rows[0])
   })

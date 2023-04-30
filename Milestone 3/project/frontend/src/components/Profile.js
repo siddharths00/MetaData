@@ -61,8 +61,34 @@ export default function Profile() {
         return myArray;
     }
 
+    function loopComments(posts) {
+        var myArray = [];
+        for (var i = 0; i < posts.length; i++) {
+
+                // console.log(posts[i].id)
+                myArray[i] = <Link to={`/profile/comments`} > <ListGroup.Item
+                    as="li"
+                    className="d-flex justify-content-between align-items-start"
+                    action
+                // onClick={ () => { navigate(`../questions/${posts[i].id}`, { replace: true })}}
+                >
+                    <div className="ms-2 me-auto" style={{}}>
+                        <div className="fw-bold">{parse(posts[i].text)}</div>
+                        {format(new Date(posts[i].creation_date))}
+                    </div>
+                    <Badge bg="primary" pill>
+                        {posts[i].score}
+                    </Badge>
+                </ListGroup.Item>
+            </Link>
+        }
+        return myArray;
+    }
+
+
     const [details, setDetails] = useState([]);
     const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [displayName, setDisplayName] = useState('');
     const [id, setId] = useState('');
@@ -83,6 +109,7 @@ export default function Profile() {
             .then(
                 () => {
                     getPosts();
+                    getComments();
                 }
             )
             .catch(
@@ -105,6 +132,31 @@ export default function Profile() {
 
                     console.log(postRequest);
                     setPosts(postRequest);
+                    setLoading(false)
+
+                }
+            )
+            .catch(
+                (err) => {
+                    console.log(err)
+                }
+            )
+
+    }
+
+    const getComments = () => {
+
+        axios.post("http://localhost:3001/own_profile_comments", {
+            withCredentials: true,
+        })
+            .then(
+                (res) => {
+                    // console.log(res)
+
+                    const postRequest = res.data.data;
+
+                    console.log(postRequest);
+                    setComments(postRequest);
                     setLoading(false)
 
                 }
@@ -236,9 +288,19 @@ export default function Profile() {
                                 variant='h5'
                                 marginBottom={3}
                             >Top Posts</Typography>
-                            <Card className='posts'>
+                            <Card className='posts'marginBottom={3}>
                                 <ListGroup as="ol" numbered>
                                     {loopPosts(posts)}
+                                </ListGroup>
+                            </Card>
+
+                            <Typography
+                                variant='h5'
+                                marginBottom={3}
+                            >Top Comments</Typography>
+                            <Card className='posts'>
+                                <ListGroup as="ol" numbered>
+                                    {loopComments(comments)}
                                 </ListGroup>
                             </Card>
                         </div>

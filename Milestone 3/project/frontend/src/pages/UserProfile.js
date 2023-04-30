@@ -5,8 +5,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Profile from "../components/Profile";
 import PQuestions from "../components/pQuestions";
 import PAnswers from "../components/pAnswers";
+import PComments from "../components/pComments";
 import EditPost from "../components/EditPost";
 import EditAnswer from "../components/EditAnswer";
+import EditComment from "../components/EditComment";
 import NotFound from "../components/NotFound";
 
 
@@ -73,8 +75,10 @@ const UserProfile = ({ theme, children }) => {
           <Route path="account" element={<Profile />} />
           <Route path="questions" element={<PQuestions />} />
           <Route path="answers" element={<PAnswers />} />
+          <Route path="comments" element={<PComments />} />
           < Route path="questions/:id" element={ < EditPost/>} />
           < Route path="answers/:id" element={ < EditAnswer />} />
+          < Route path="comments/:id" element={ < EditComment />} />
           < Route path="*" element={ < NotFound />} />
         </Routes>
 

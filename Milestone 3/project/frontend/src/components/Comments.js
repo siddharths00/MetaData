@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AddAnswer from './AddAnswer';
 import Comment from './Comment';
-
+import AddComment from './AddComment';
 const Answers = (props) => {
 
     const q_id = props.id;
@@ -71,7 +71,7 @@ const Answers = (props) => {
             {
                 loading? "Loading ... ": (
 
-                    <ul className='list-group'>
+                    <ul className='list-group' style={{ paddingLeft: 100, marginLeft:"0" }}>
                         {
                             answers.map( (ans) => (
 
@@ -81,7 +81,7 @@ const Answers = (props) => {
                             )
                         }
 
-                        {/* <AddAnswer q_id={q_id} setReload = { setReload } reload = { reload } answers = {answers} setAnswers = {setAnswers} userid={userid} isAuth={isAuth}/> */}
+                        <AddComment q_id={q_id} setReload = { setReload } reload = { reload } answers = {answers} setAnswers = {setAnswers} userid={userid} isAuth={isAuth}/>
                         
                     </ul>
                 )

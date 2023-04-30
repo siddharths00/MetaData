@@ -89,8 +89,8 @@ const Question = (props) => {
               </Grid>
 
 
+            <Comments id={postid} userid={userid} isAuth={isAuth}/>
           </Grid>
-          {/* <Comments id={postid} userid={userid} isAuth={isAuth}/> */}
       </div>
     ))}
     </div>);

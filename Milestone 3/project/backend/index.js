@@ -403,6 +403,22 @@ app.post("/own_profile_posts", (req, res) => {
 
 });
 
+app.post("/own_profile_comments", (req, res) => {
+
+  const owner_id = req.body.id;
+  const owner_user_id = req.session.userid;
+  pool.query("SELECT text,score,creation_date from comments where user_id = $1 order by score desc LIMIT 10;", [owner_user_id], (err, responses) => {
+    if (err) {
+      console.log(err);
+      res.send({ err: err });
+    }
+    else {
+      res.send({ data: responses.rows });
+    }
+  })
+
+});
+
 app.get("/tags", (req, res) => {
   pool.query("select tag_name from tags;", (err, responses) => {
     if (err) {
@@ -489,6 +505,20 @@ app.get("/own_all_questions", (req, res) => {
   })
 })
 
+app.get("/own_all_comments", (req, res) => {
+  const id = req.session.userid;
+  pool.query("select * from comments where user_id = $1 order by creation_date;", [id], (err, responses) => {
+    if (err) {
+      console.log(err);
+      res.send({ err: err });
+    }
+    else {
+      
+      res.send({ data: responses.rows });
+    }
+  })
+})
+
 app.get("/own_all_answers", (req, res) => {
   const id = req.session.userid;
   pool.query("select P.id,P.score,P.creation_date,Q.title from posts as P,posts as Q where P.owner_user_id = $1 and P.post_type_id = 2 and P.parent_id = Q.id order by creation_date;", [id], (err, responses) => {
@@ -508,6 +538,24 @@ app.post("/own_post", (req, res) => {
   const id = req.body.id;
   console.log(id)
   pool.query("select title,tags,body from posts where id = $1 AND owner_user_id = $2", [id, req.session.userid], (err, responses) => {
+    if (err) {
+      console.log(err);
+      res.send({ err: err });
+    }
+    else {
+
+      if (responses.rows.length !== 0){
+        tagstring = responses.rows[0].tags;
+      }
+      res.send({ data: responses.rows });
+    }
+  })
+});
+
+app.post("/own_comment", (req, res) => {
+  const id = req.body.id;
+  console.log(id)
+  pool.query("select text from comments where id = $1 AND user_id = $2", [id, req.session.userid], (err, responses) => {
     if (err) {
       console.log(err);
       res.send({ err: err });
@@ -603,6 +651,29 @@ app.post("/editpost", async (req, res) => {
 
 });
 
+app.post("/editcomment", async (req, res) => {
+
+
+  const body = req.body.question;
+  const id = req.body.id
+
+  pool.query("UPDATE comments SET text = $1 WHERE id = $2;", [body, id],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      if (result) {
+        msg = "Edited Comment";
+        console.log('Edited comment')
+
+        res.send(msg);
+      }
+
+    })
+
+});
+
+
 function tagParser(tag_string) {
   var j = 0;
   var start = 1, end;
@@ -696,6 +767,21 @@ app.get('/', (req, res) => {
 
 
   }
+  else if (which === "comments") {
+
+    const q_id = like;
+
+    getComments(q_id)
+      .then(response => {
+        res.status(200).send(response);
+      })
+      .catch(error => {
+
+        res.status(500).send(error);
+      });
+
+
+  }
   else {
 
     res.status(404).send("Unknown GET request");
@@ -707,6 +793,19 @@ app.get('/', (req, res) => {
 app.post('/addAnswer', (req, res) => {
 
   addAnswer(req.body)
+    .then(response => {
+      res.status(200).send(response);
+    })
+    .catch(error => {
+
+      res.status(500).send(error);
+    }
+    );
+});
+
+app.post('/addComment', (req, res) => {
+
+  addComment(req.body)
     .then(response => {
       res.status(200).send(response);
     })
@@ -908,6 +1007,24 @@ app.post('/deletepost', (req, res) => {
 
     res.send("Post Deleted");
     console.log('Post deleted');
+  });
+
+});
+
+app.post('/deletecomment', (req, res) => {
+
+
+  const postid = req.body.id;
+
+  pool.query("DELETE FROM comments WHERE id = $1", [postid], (err, result) => {
+
+
+    if (err)
+      console.log(err);
+
+
+    res.send("Comment Deleted");
+    console.log('Comment deleted');
   });
 
 });
@@ -1237,6 +1354,43 @@ const getPost = (id) => {
 };
 
 
+const getComments = (q_id) => {
+
+  // console.log(q_id);
+
+  /*
+      SELECT * 
+      FROM posts
+      WHERE parent_id = {q_id} AND 
+      post_type_id = 2
+      ORDER BY score DESC
+
+  */
+
+  //Not limiting not expecting too many answers
+
+  const str = `SELECT * FROM comments WHERE post_id = ${q_id} ORDER BY CREATION_DATE DESC`;
+
+  return new Promise(function (resolve, reject) {
+
+    pool.query(str, (error, results) => {
+
+      if (error) {
+
+        console.log(error);
+        reject(error)
+      }
+
+      console.log(results.rows,"Commments =========================");
+      resolve(results.rows);
+
+    });
+  });
+
+
+
+};
+
 const getAnswers = (q_id) => {
 
   // console.log(q_id);
@@ -1298,6 +1452,34 @@ const addAnswer = (ans) => {
   });
 
 };
+
+const addComment = (ans) => {
+
+
+  const { owner, q_id, owner_display_name, content_license, body } = ans;
+
+
+  const str = `INSERT INTO comments(post_id, user_id, score, user_display_name, text, creation_date) VALUES ($1, $2, 0, $3, $4,CURRENT_TIMESTAMP) RETURNING id`;
+  // const str = `Delete from comments where id=8183`;
+  console.log(str)
+  return new Promise(function (resolve, reject) {
+
+
+    pool.query(str, [q_id, owner, owner_display_name, body], (error, results) => {
+
+      if (error) {
+
+        console.log(error);
+        reject(error);
+      }
+      console.log("Inserted data from backend ", results);
+      resolve(results.rows[0]);
+
+    });
+  });
+
+};
+
 
 const updateScore = (body) => {
 

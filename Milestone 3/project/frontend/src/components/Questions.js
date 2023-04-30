@@ -103,7 +103,7 @@ const Questions = () => {
                 getPosts('title');
                 break;
 
-            case 'User ID':
+            case 'User Name':
                 getPosts('userpost');
                 break;
 
@@ -196,7 +196,7 @@ const Questions = () => {
                                     < FormLabel> Search By </FormLabel>
                                     < RadioGroup value={searchCategory} onChange={(e) => { setSearchCategory(e.target.value) }}>
                                         < FormControlLabel control={< Radio />} label='Title' value='Title' />
-                                        < FormControlLabel control={< Radio />} label='User ID' value='User ID' />
+                                        < FormControlLabel control={< Radio />} label='User Name' value='User Name' />
                                         < FormControlLabel control={< Radio />} label='Tags' value='Tags' />
                                     </RadioGroup>
                                 </FormControl>

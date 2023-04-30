@@ -1252,7 +1252,7 @@ const getPosts = (like, offset, limit, sort, option) => {
     return new Promise(function (resolve, reject) {
 
 
-      pool.query(`SELECT * FROM posts WHERE  ( post_type_id = 1 ) AND (owner_user_id = $1) ORDER BY creation_date DESC OFFSET ${offset} LIMIT ${limit}`, [+like], (error, results) => {
+      pool.query(`with t as (select id from users where display_name=$1) (SELECT * FROM posts WHERE  ( post_type_id = 1 ) AND (owner_user_id in (select id from t)) ORDER BY creation_date DESC OFFSET ${offset} LIMIT ${limit})`, [+like], (error, results) => {
 
         if (error) {
           reject(error)
@@ -1268,7 +1268,7 @@ const getPosts = (like, offset, limit, sort, option) => {
 
     return new Promise(function (resolve, reject) {
 
-      pool.query(`SELECT * FROM posts WHERE (post_type_id = 1 ) AND (owner_user_id = $1) ORDER BY score DESC OFFSET ${offset} LIMIT ${limit}`, [+like], (error, results) => {
+      pool.query(`with t as (select id from users where display_name=$1) (SELECT * FROM posts WHERE (post_type_id = 1 ) AND owner_user_id in (select id from t) ORDER BY score DESC OFFSET ${offset} LIMIT ${limit})`, [+like], (error, results) => {
 
         if (error) {
           reject(error)

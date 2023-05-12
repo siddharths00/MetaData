@@ -7,6 +7,10 @@ import parse from 'html-react-parser';
 // import Col from 'react-bootstrap/Col';
 import Card from '@mui/material/Card'
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import { DeleteOutline } from '@mui/icons-material';
+// import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+
 // import './user.css';
 // import ProfilePic from './download.jpeg';
 
@@ -111,6 +115,53 @@ export default function Profile() {
         }
         return myArray;
     }
+
+    const deleteUser = (e) => {
+
+        console.log(e.target);
+    
+    
+        axios.post('http://localhost:3001/deleteuser', {
+          id: details[0].id
+        }).then((response) => {
+          console.log("User deleted");
+          var result = JSON.stringify(response.data);
+          console.log(result)
+
+          axios.post('http://localhost:3001/logout')
+
+            .then((response) => {
+      
+              var result = JSON.stringify(response.data);
+              var json = JSON.parse(result);
+              console.log(json.message);
+      
+              if (json.message == 'Logged out') {
+              //   setIsAuth(false);
+                setDisplayName(null);
+              //   setImageURL(null);
+              console.log("Deleted the user88888888888888888888888888888888888888888888888888")
+                navigate('/Login');
+              }
+            })
+            .catch((err) => {
+      
+              console.log(err);
+      
+            })
+            
+
+        })
+          .catch((err) => {
+    
+            console.log(err);
+          })
+        //   .finally(()=>{
+            
+        //   })
+          ;
+    
+      }
 
 
     const [details, setDetails] = useState([]);
@@ -249,7 +300,11 @@ export default function Profile() {
                             <Typography
                                 variant='h3'
                                 marginTop={4}
-                            > {details[0].display_name}</Typography>
+                            > {details[0].display_name}
+                                <IconButton onClick={deleteUser} >
+                                    <DeleteOutline />
+                                </IconButton>
+                            </Typography>
 
                             <Typography
                                 color='textSecondary'

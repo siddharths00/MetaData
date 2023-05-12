@@ -49,17 +49,17 @@ const DownVote = ({ postid, userid, setScore, score, downvoteDisabled, setDownvo
 
             setDownvoteDisabled(true);
 
-            axios.post('http://localhost:3001/updateScore', {
-                id: postid,
-                update: "-"
-            })
-                .then(function (response) {
-                    console.log(response);
+            // axios.post('http://localhost:3001/updateScore', {
+            //     id: postid,
+            //     update: "-"
+            // })
+            //     .then(function (response) {
+            //         console.log(response);
 
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            //     })
+            //     .catch(function (error) {
+            //         console.log(error);
+            //     });
 
             axios.post('http://localhost:3001/addVote', {
                 postid: postid,
@@ -78,17 +78,17 @@ const DownVote = ({ postid, userid, setScore, score, downvoteDisabled, setDownvo
 
             setUpvoteDisabled(false);
 
-            axios.post('http://localhost:3001/updateScore', {
-                id: postid,
-                update: "-"
-            })
-                .then(function (response) {
-                    console.log(response);
+            // axios.post('http://localhost:3001/updateScore', {
+            //     id: postid,
+            //     update: "-"
+            // })
+            //     .then(function (response) {
+            //         console.log(response);
 
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            //     })
+            //     .catch(function (error) {
+            //         console.log(error);
+            //     });
 
             axios.post('http://localhost:3001/removeVote', {
                 postid: postid,

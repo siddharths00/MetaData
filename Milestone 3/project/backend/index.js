@@ -852,25 +852,25 @@ app.post('/removeVote', (req, res) => {
       }  
     });
 
-    if(!er)
-    {
-        pool.query("UPDATE USERS SET up_votes=up_votes-1 where id = $1", [userid], (err, result2) => {
+  //   if(!er)
+  //   {
+  //       pool.query("UPDATE USERS SET up_votes=up_votes-1 where id = $1", [userid], (err, result2) => {
 
-          if (err) {
-            er=true;
-            console.log(err);
-            pool.query("ROLLBACK", [], (err, result2) => {});
-          }
+  //         if (err) {
+  //           er=true;
+  //           console.log(err);
+  //           pool.query("ROLLBACK", [], (err, result2) => {});
+  //         }
     
-        if (result2) {
+  //       if (result2) {
     
-          // res.send(result.rows);
-          console.log("Updated users also")
-        }
+  //         // res.send(result.rows);
+  //         console.log("Updated users also")
+  //       }
     
     
-      });
-  }
+  //     });
+  // }
 
   if(!er) {
     pool.query("DELETE FROM votes WHERE user_id = $1 AND post_id = $2 AND vote_type_id = $3", [userid, postid, type], (err, result) => {
@@ -927,25 +927,25 @@ app.post('/removeVote', (req, res) => {
       }  
     });
 
-    if(!er)
-    {
-        pool.query("UPDATE USERS SET down_votes=down_votes-1 where id = $1", [userid], (err, result2) => {
+  //   if(!er)
+  //   {
+  //       pool.query("UPDATE USERS SET down_votes=down_votes-1 where id = $1", [userid], (err, result2) => {
 
-          if (err) {
-            er=true;
-            console.log(err);
-            pool.query("ROLLBACK", [], (err, result2) => {});
-          }
+  //         if (err) {
+  //           er=true;
+  //           console.log(err);
+  //           pool.query("ROLLBACK", [], (err, result2) => {});
+  //         }
     
-        if (result2) {
+  //       if (result2) {
     
-          // res.send(result.rows);
-          console.log("Updated users also")
-        }
+  //         // res.send(result.rows);
+  //         console.log("Updated users also")
+  //       }
     
     
-      });
-  }
+  //     });
+  // }
 
   if(!er) {
     pool.query("DELETE FROM votes WHERE user_id = $1 AND post_id = $2 AND vote_type_id = $3", [userid, postid, type], (err, result) => {
@@ -1008,24 +1008,24 @@ app.post('/addVote', (req, res) => {
       }  
     });
 
-    if(!er) {
-        pool.query("UPDATE USERS SET up_votes=up_votes+1 where id = $1", [userid], (err, result2) => {
+    // if(!er) {
+    //     pool.query("UPDATE USERS SET up_votes=up_votes+1 where id = $1", [userid], (err, result2) => {
 
-          if (err) {
-            er=true;
-            console.log(err);
-            pool.query("ROLLBACK", [], (err, result2) => {});
-          }
+    //       if (err) {
+    //         er=true;
+    //         console.log(err);
+    //         pool.query("ROLLBACK", [], (err, result2) => {});
+    //       }
       
-          if (result2) {
+    //       if (result2) {
       
-            // res.send(result.rows);
-            console.log("Updated users also")
-          }
+    //         // res.send(result.rows);
+    //         console.log("Updated users also")
+    //       }
       
       
-        });
-    }
+    //     });
+    // }
 
     if(!er) {
       pool.query("INSERT INTO votes(user_id, post_id, vote_type_id, creation_date) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)", [userid, postid, type], (err, result) => {
@@ -1064,24 +1064,24 @@ app.post('/addVote', (req, res) => {
       }  
     });
 
-    if(!er) {
-      pool.query("UPDATE USERS SET down_votes=down_votes+1 where id = $1", [userid], (err, result2) => {
+    // if(!er) {
+    //   pool.query("UPDATE USERS SET down_votes=down_votes+1 where id = $1", [userid], (err, result2) => {
 
-        if (err) {
-          er=true;
-          console.log(err);
-          pool.query("ROLLBACK", [], (err, result2) => {});
-        }
+    //     if (err) {
+    //       er=true;
+    //       console.log(err);
+    //       pool.query("ROLLBACK", [], (err, result2) => {});
+    //     }
     
-        if (result2) {
+    //     if (result2) {
     
-          // res.send(result.rows);
-          console.log("Updated users also")
-        }
+    //       // res.send(result.rows);
+    //       console.log("Updated users also")
+    //     }
     
     
-      });
-    }
+    //   });
+    // }
 
     if(!er) {
       pool.query("INSERT INTO votes(user_id, post_id, vote_type_id, creation_date) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)", [userid, postid, type], (err, result) => {
@@ -1199,6 +1199,52 @@ app.post('/deletepost', (req, res) => {
   });
 
 });
+
+app.post('/deleteuser', (req, res) => {
+
+
+  const id = req.body.id;
+  let er = false;
+  console.log("here999999999999999999999999999")
+  if(!er) {
+    pool.query("DELETE FROM votes WHERE user_id = $1", [id], (err, result) => {
+    
+      if (err)
+      {
+        console.log(err);
+        er=true;
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }
+  
+      console.log('Vote Removed');
+      // res.send("Vote Removed");
+  
+    })
+  }
+
+  if(!er) {
+    pool.query("DELETE FROM users WHERE id = $1", [id], (err, result) => {
+
+
+      if (err)
+      {
+        console.log(err);
+        er=true;
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }
+
+
+      // res.send("User Deleted");
+      console.log('User deleted == from index.js');
+    });
+  }
+
+if(!er){
+  pool.query("COMMIT", [], (err, result2) => {});
+}
+res.send("Successfully deleted");
+});
+
 
 app.post('/deletecomment', (req, res) => {
 

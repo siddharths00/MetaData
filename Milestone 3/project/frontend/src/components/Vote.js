@@ -8,7 +8,7 @@ import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDown
 
 const Vote = ({postid, userid,setScore,score,upvoteDisabled , setUpvoteDisabled , setDownvoteDisabled,downvoteDisabled }) => {
     return (
-        
+         
 
             <ButtonGroup size="small" aria-label="small button group" sx={{ margin: 0 }}>
                 <UpVote postid={postid} userid={userid} setScore={setScore} score={score} upvoteDisabled = {upvoteDisabled} setUpvoteDisabled = {setUpvoteDisabled} setDownvoteDisabled={setDownvoteDisabled} downvoteDisabled = {downvoteDisabled}/>

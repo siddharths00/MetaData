@@ -42,6 +42,7 @@ export default function Profile() {
         for (var i = 0; i < posts.length; i++) {
 
                 // console.log(posts[i].id)
+                if((posts[i].title)){
                 myArray[i] = <Link to={`/profile/questions`} > <ListGroup.Item
                     as="li"
                     className="d-flex justify-content-between align-items-start"
@@ -58,6 +59,32 @@ export default function Profile() {
                 </ListGroup.Item>
             </Link>
         }
+    }
+        return myArray;
+    }
+
+    function loopAnswers(posts) {
+        var myArray = [];
+        for (var i = 0; i < posts.length; i++) {
+                if(!(posts[i].title)){
+                // console.log(posts[i].id)
+                myArray[i] = <Link to={`/profile/questions`} > <ListGroup.Item
+                    as="li"
+                    className="d-flex justify-content-between align-items-start"
+                    action
+                // onClick={ () => { navigate(`../questions/${posts[i].id}`, { replace: true })}}
+                >
+                    <div className="ms-2 me-auto" style={{}}>
+                        <div className="fw-bold">{posts[i].body}</div>
+                        {format(new Date(posts[i].creation_date))}
+                    </div>
+                    <Badge bg="primary" pill>
+                        {posts[i].score}
+                    </Badge>
+                </ListGroup.Item>
+            </Link>
+        }
+    }
         return myArray;
     }
 
@@ -129,7 +156,7 @@ export default function Profile() {
                     // console.log(res)
 
                     const postRequest = res.data.data;
-
+                    console.log(res.data,"9999999999999999999999999");
                     console.log(postRequest);
                     setPosts(postRequest);
                     setLoading(false)
@@ -293,6 +320,16 @@ export default function Profile() {
                                     {loopPosts(posts)}
                                 </ListGroup>
                             </Card>
+
+                            {/* <Typography
+                                variant='h5'
+                                marginBottom={3}
+                            >Top Answers</Typography>
+                            <Card className='posts'marginBottom={3}>
+                                <ListGroup as="ol" numbered>
+                                    {loopAnswers(posts)}
+                                </ListGroup>
+                            </Card> */}
 
                             <Typography
                                 variant='h5'

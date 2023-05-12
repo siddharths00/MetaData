@@ -214,7 +214,7 @@ app.post('/upvote', (req, res) => {
   const postid = req.body.postid;
   const userid = req.body.userid;
 
-  pool.query("SELECT COUNT(*) FROM votes WHERE vote_type_id = 2 AND post_id = $1", [postid], (err, result) => {
+  pool.query("SELECT COUNT(*) FROM votes WHERE vote_type_id = 2 AND post_id = $1 AND user_id = $2", [postid, userid], (err, result) => {
 
     if (err) {
 
@@ -237,7 +237,7 @@ app.post('/downvote', (req, res) => {
   const postid = req.body.postid;
   const userid = req.body.userid;
 
-  pool.query("SELECT COUNT(*) FROM votes WHERE vote_type_id = 3 AND post_id = $1", [postid], (err, result) => {
+  pool.query("SELECT COUNT(*) FROM votes WHERE vote_type_id = 3 AND post_id = $1 AND user_id = $2", [postid, userid], (err, result) => {
 
     if (err) {
 
@@ -391,12 +391,13 @@ app.post("/own_profile_posts", (req, res) => {
 
   const owner_id = req.body.id;
   const owner_user_id = req.session.userid;
-  pool.query("SELECT title,score,creation_date from posts where owner_user_id = $1 and title is not null order by score desc LIMIT 10;", [owner_user_id], (err, responses) => {
+  pool.query("SELECT title,score,creation_date from posts where owner_user_id = $1 order by score desc LIMIT 10;", [owner_user_id], (err, responses) => {
     if (err) {
       console.log(err);
       res.send({ err: err });
     }
     else {
+      console.log(responses.rows, "99999999999999999999999")
       res.send({ data: responses.rows });
     }
   })
@@ -494,6 +495,20 @@ app.post("/createpost", async (req, res) => {
 app.get("/own_all_questions", (req, res) => {
   const id = req.session.userid;
   pool.query("select * from posts where owner_user_id = $1 and post_type_id = 1 order by creation_date;", [id], (err, responses) => {
+    if (err) {
+      console.log(err);
+      res.send({ err: err });
+    }
+    else {
+      
+      res.send({ data: responses.rows });
+    }
+  })
+})
+
+app.get("/own_all_answers", (req, res) => {
+  const id = req.session.userid;
+  pool.query("select * from posts where owner_user_id = $1 and post_type_id = 2 order by creation_date;", [id], (err, responses) => {
     if (err) {
       console.log(err);
       res.send({ err: err });
@@ -826,59 +841,147 @@ app.post('/removeVote', (req, res) => {
   if (update === '+'){
 
     type = 2;
+    let er=false;
 
-    pool.query("UPDATE USERS SET up_votes=up_votes-1 where id = $1", [userid], (err, result2) => {
-
+    pool.query("BEGIN", [], (err, result2) => {
+      
       if (err) {
-  
+        er = true;
         console.log(err);
-  
-      }
-  
-      if (result2) {
-  
-        // res.send(result.rows);
-        console.log("Updated users also")
-      }
-  
-  
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }  
     });
+
+    if(!er)
+    {
+        pool.query("UPDATE USERS SET up_votes=up_votes-1 where id = $1", [userid], (err, result2) => {
+
+          if (err) {
+            er=true;
+            console.log(err);
+            pool.query("ROLLBACK", [], (err, result2) => {});
+          }
+    
+        if (result2) {
+    
+          // res.send(result.rows);
+          console.log("Updated users also")
+        }
+    
+    
+      });
+  }
+
+  if(!er) {
+    pool.query("DELETE FROM votes WHERE user_id = $1 AND post_id = $2 AND vote_type_id = $3", [userid, postid, type], (err, result) => {
+    
+      if (err)
+      {
+        console.log(err);
+        er=true;
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }
+  
+      console.log('Vote Removed');
+      res.send("Vote Removed");
+  
+    })
+  }
+
+  if(!er){
+    pool.query("COMMIT", [], (err, result2) => {});
+  }
 
   }
   else if (update === '-'){
 
     type = 3;
-    pool.query("UPDATE USERS SET down_votes=down_votes-1 where id = $1", [userid], (err, result2) => {
+    // pool.query("UPDATE USERS SET down_votes=down_votes-1 where id = $1", [userid], (err, result2) => {
 
+    //   if (err) {
+  
+    //     console.log(err);
+  
+    //   }
+  
+    //   if (result2) {
+  
+    //     // res.send(result.rows);
+    //     console.log("Updated users also")
+    //   }
+  
+  
+    // });
+
+
+
+
+    let er=false;
+
+    pool.query("BEGIN", [], (err, result2) => {
+      
       if (err) {
-  
+        er = true;
         console.log(err);
-  
-      }
-  
-      if (result2) {
-  
-        // res.send(result.rows);
-        console.log("Updated users also")
-      }
-  
-  
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }  
     });
+
+    if(!er)
+    {
+        pool.query("UPDATE USERS SET down_votes=down_votes-1 where id = $1", [userid], (err, result2) => {
+
+          if (err) {
+            er=true;
+            console.log(err);
+            pool.query("ROLLBACK", [], (err, result2) => {});
+          }
+    
+        if (result2) {
+    
+          // res.send(result.rows);
+          console.log("Updated users also")
+        }
+    
+    
+      });
+  }
+
+  if(!er) {
+    pool.query("DELETE FROM votes WHERE user_id = $1 AND post_id = $2 AND vote_type_id = $3", [userid, postid, type], (err, result) => {
+    
+      if (err)
+      {
+        console.log(err);
+        er=true;
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }
+  
+      console.log('Vote Removed');
+      res.send("Vote Removed");
+  
+    })
+  }
+
+  if(!er){
+    pool.query("COMMIT", [], (err, result2) => {});
+  }
+
 
   }
   else
     console.log('shouldn\'t print this');
 
 
-  pool.query("DELETE FROM votes WHERE user_id = $1 AND post_id = $2 AND vote_type_id = $3", [userid, postid, type], (err, result) => {
+  // pool.query("DELETE FROM votes WHERE user_id = $1 AND post_id = $2 AND vote_type_id = $3", [userid, postid, type], (err, result) => {
     
-    if (err)
-      console.log(err);
+  //   if (err)
+  //     console.log(err);
 
-    console.log('Vote Removed');
-    res.send("Vote Removed");
+  //   console.log('Vote Removed');
+  //   res.send("Vote Removed");
 
-  })
+  // })
 
 // when we delete a post delete the votes from the table aswell
 
@@ -894,62 +997,133 @@ app.post('/addVote', (req, res) => {
   if (update === '+'){
 
     type = 2;
-    pool.query("UPDATE USERS SET up_votes=up_votes+1 where id = $1", [userid], (err, result2) => {
+    let er=false;
 
+    pool.query("BEGIN", [], (err, result2) => {
+      
       if (err) {
-  
+        er = true;
         console.log(err);
-  
-      }
-  
-      if (result2) {
-  
-        // res.send(result.rows);
-        console.log("Updated users also")
-      }
-  
-  
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }  
     });
+
+    if(!er) {
+        pool.query("UPDATE USERS SET up_votes=up_votes+1 where id = $1", [userid], (err, result2) => {
+
+          if (err) {
+            er=true;
+            console.log(err);
+            pool.query("ROLLBACK", [], (err, result2) => {});
+          }
+      
+          if (result2) {
+      
+            // res.send(result.rows);
+            console.log("Updated users also")
+          }
+      
+      
+        });
+    }
+
+    if(!er) {
+      pool.query("INSERT INTO votes(user_id, post_id, vote_type_id, creation_date) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)", [userid, postid, type], (err, result) => {
+    
+        if (err)
+        {
+          console.log(err);
+          er=true;
+          pool.query("ROLLBACK", [], (err, result2) => {});
+        }
+    
+        console.log('Vote Inserted');
+        res.send('Vote Inserted');
+        
+    
+      })
+    }
+
+    if(!er){
+      pool.query("COMMIT", [], (err, result2) => {});
+    }
 
   }
   else if (update === '-'){
 
     type = 3;
-    pool.query("UPDATE USERS SET down_votes=down_votes+1 where id = $1", [userid], (err, result2) => {
+    
+    let er=false;
 
+    pool.query("BEGIN", [], (err, result2) => {
+      
       if (err) {
-  
+        er = true;
         console.log(err);
-  
-      }
-  
-      if (result2) {
-  
-        // res.send(result.rows);
-        console.log("Updated users also")
-      }
-  
-  
+        pool.query("ROLLBACK", [], (err, result2) => {});
+      }  
     });
+
+    if(!er) {
+      pool.query("UPDATE USERS SET down_votes=down_votes+1 where id = $1", [userid], (err, result2) => {
+
+        if (err) {
+          er=true;
+          console.log(err);
+          pool.query("ROLLBACK", [], (err, result2) => {});
+        }
+    
+        if (result2) {
+    
+          // res.send(result.rows);
+          console.log("Updated users also")
+        }
+    
+    
+      });
+    }
+
+    if(!er) {
+      pool.query("INSERT INTO votes(user_id, post_id, vote_type_id, creation_date) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)", [userid, postid, type], (err, result) => {
+    
+        if (err)
+        {
+          console.log(err);
+          er=true;
+          pool.query("ROLLBACK", [], (err, result2) => {});
+        }
+    
+        console.log('Vote Inserted');
+        res.send('Vote Inserted');
+        
+    
+      })
+    }
+
+    if(!er){
+      pool.query("COMMIT", [], (err, result2) => {});
+    }
+
+    
   }
   else
     console.log('shouldn\'t print this');
 
-  pool.query("INSERT INTO votes(user_id, post_id, vote_type_id, creation_date) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)", [userid, postid, type], (err, result) => {
+  // pool.query("INSERT INTO votes(user_id, post_id, vote_type_id, creation_date) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)", [userid, postid, type], (err, result) => {
     
-    if (err)
-      console.log(err);
+  //   if (err)
+  //     console.log(err);
 
-    console.log('Vote Inserted');
-    res.send('Vote Inserted');
+  //   console.log('Vote Inserted');
+  //   res.send('Vote Inserted');
 
-  })
+  // })
 
 })
 
 app.post('/updateScore', (req, res) => {
 
-
+  console.log("updating 1####################")
   updateScore(req.body)
     .then(response => {
       res.status(200).send(response);
@@ -960,6 +1134,21 @@ app.post('/updateScore', (req, res) => {
     }
     );
 });
+
+app.post('/updateView', (req, res) => {
+
+  console.log("Updating the view 1")
+  updateView(req.body)
+    .then(response => {
+      res.status(200).send(response);
+    })
+    .catch(error => {
+
+      res.status(500).send(error);
+    }
+    );
+});
+
 
 app.get('/user', (req, res) => {
 
@@ -1252,12 +1441,12 @@ const getPosts = (like, offset, limit, sort, option) => {
     return new Promise(function (resolve, reject) {
 
 
-      pool.query(`with t as (select id from users where display_name=$1) (SELECT * FROM posts WHERE  ( post_type_id = 1 ) AND (owner_user_id in (select id from t)) ORDER BY creation_date DESC OFFSET ${offset} LIMIT ${limit})`, [+like], (error, results) => {
+      pool.query(`with t as (select id from users where display_name=$1) (SELECT * FROM posts WHERE  ( post_type_id = 1 ) AND (owner_user_id in (select id from t)) ORDER BY creation_date DESC OFFSET ${offset} LIMIT ${limit})`, [like], (error, results) => {
 
         if (error) {
           reject(error)
         }
-
+        console.log(results.rows,"******************* 1260", like)
         resolve(results.rows);
 
       });
@@ -1268,7 +1457,7 @@ const getPosts = (like, offset, limit, sort, option) => {
 
     return new Promise(function (resolve, reject) {
 
-      pool.query(`with t as (select id from users where display_name=$1) (SELECT * FROM posts WHERE (post_type_id = 1 ) AND owner_user_id in (select id from t) ORDER BY score DESC OFFSET ${offset} LIMIT ${limit})`, [+like], (error, results) => {
+      pool.query(`with t as (select id from users where display_name=$1) (SELECT * FROM posts WHERE (post_type_id = 1 ) AND owner_user_id in (select id from t) ORDER BY score DESC OFFSET ${offset} LIMIT ${limit})`, [like], (error, results) => {
 
         if (error) {
           reject(error)
@@ -1290,7 +1479,7 @@ const getPosts = (like, offset, limit, sort, option) => {
 
     return new Promise(function (resolve, reject) {
 
-      pool.query(`SELECT * FROM getPosts($1) WHERE post_type_id = 1  ORDER BY score DESC OFFSET ${offset} LIMIT ${limit}`, [arr], (error, results) => {
+      pool.query(`SELECT * FROM posts WHERE post_type_id = 1 and tags like '%${like}%' ORDER BY score DESC OFFSET ${offset} LIMIT ${limit}`, [], (error, results) => {
 
         if (error) {
           reject(error)
@@ -1311,12 +1500,12 @@ const getPosts = (like, offset, limit, sort, option) => {
 
     return new Promise(function (resolve, reject) {
 
-      pool.query(`SELECT * FROM getPosts($1) WHERE post_type_id = 1  ORDER BY creation_date DESC OFFSET ${offset} LIMIT ${limit}`, [arr], (error, results) => {
+      pool.query(`SELECT * FROM posts WHERE post_type_id = 1 and tags like '%${like}%' ORDER BY creation_date DESC OFFSET ${offset} LIMIT ${limit}`, [], (error, results) => {
 
         if (error) {
           reject(error)
         }
-
+        console.log(error,"&&&&&&&&&&&&&&&&&&&&&&&& 1320")
         resolve(results.rows);
 
       });
@@ -1381,7 +1570,7 @@ const getComments = (q_id) => {
         reject(error)
       }
 
-      console.log(results.rows,"Commments =========================");
+      // console.log(results.rows,"Commments =========================");
       resolve(results.rows);
 
     });
@@ -1481,13 +1670,13 @@ const addComment = (ans) => {
 };
 
 
-const updateScore = (body) => {
+const updateView = (body) => {
 
   const id = body.id;
 
-  if (body.update === "+") {
-
-    const str = `UPDATE posts SET score = score + 1 WHERE id = ${id}`;
+  // if (body.update === "+") {
+    
+    const str = `UPDATE posts SET view_count = view_count + 1 WHERE id = ${id}`;
 
     return new Promise(function (resolve, reject) {
 
@@ -1499,7 +1688,34 @@ const updateScore = (body) => {
           console.log(error);
           reject(error);
         }
+        console.log("Updating the view")
+        resolve(`Score incremented`);
 
+      });
+    });
+
+  // }
+}
+
+const updateScore = (body) => {
+
+  const id = body.id;
+
+  if (body.update === "+") {
+
+    const str = `UPDATE posts SET score = score + 1 WHERE id = ${id}`;
+    
+    return new Promise(function (resolve, reject) {
+
+
+      pool.query(str, (error, results) => {
+
+        if (error) {
+
+          console.log(error);
+          reject(error);
+        }
+        console.log("updating 2####################")
         resolve(`Score incremented`);
 
       });

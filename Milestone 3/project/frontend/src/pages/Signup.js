@@ -177,7 +177,7 @@ export default function Signup(props) {
                                 helperText = { status }
                                 required
                             />
-                            <TextField
+                            {/* <TextField
                                 margin="normal"
                                 fullWidth
                                 name="location"
@@ -187,8 +187,8 @@ export default function Signup(props) {
                                 onChange={(e) => { setLocation(e.target.value) }}
                             // error={ passwordError }
                             // helperText = {passwordError? loginStatus : ''}
-                            />
-                            <TextField
+                            /> */}
+                            {/* <TextField
                                 margin="normal"
                                 fullWidth
                                 name="imageURL"
@@ -197,8 +197,8 @@ export default function Signup(props) {
                                 onChange={(e) => { setImageURL(e.target.value) }}
                             // error={ passwordError }
                             // helperText = {passwordError? loginStatus : ''}
-                            />
-                            <TextField
+                            /> */}
+                            {/* <TextField
                                 // onChange={(e) => { setDetails(e.target.value) }}
                                 label='About me'
                                 placeholder='Tell us about yourselves !'
@@ -209,7 +209,7 @@ export default function Signup(props) {
                                 multiline
                                 rows={4}
                                 onChange={(e) => { setAboutMe(e.target.value) }}
-                            ></TextField>
+                            ></TextField> */}
 
                             <Button
                                 type="submit"

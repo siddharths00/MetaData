@@ -22,9 +22,9 @@ const Comment = ({ ans, userid, isAuth }) => {
       {/* {console.log(ans.id, "$$$$ Inside comment")} */}
       < Grid container spacing={2} xs={12}>
 
-        <Grid item xs={12} md={9} sx={{ alignSelf: 'end', marginBottom: 1 }}>
+        {/* <Grid item xs={12} md={9} sx={{ alignSelf: 'end', marginBottom: 1 }}>
           {isAuth ? < Vote postid={ans.id} userid={userid} setScore={setScore} score={score} upvoteDisabled={upvoteDisabled} setUpvoteDisabled={setUpvoteDisabled} setDownvoteDisabled={setDownvoteDisabled} downvoteDisabled={downvoteDisabled} /> : null}
-        </Grid>
+        </Grid> */}
 
         <Grid item xs={12} md={3}>
           < User id={ans.owner_user_id} creation_date={ans.creation_date} />

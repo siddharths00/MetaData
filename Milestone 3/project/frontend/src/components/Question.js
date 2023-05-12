@@ -24,7 +24,7 @@ const Question = (props) => {
   useEffect(() => {
 
     setLoading(true);
-
+    
     axios.get('http://localhost:3001', {
 
       params: {
@@ -47,9 +47,30 @@ const Question = (props) => {
       .finally(function () {
 
         setLoading(false);
+        
       });
 
+      // if(loading==false) {
+        
+      // }
+
   }, [postid]);
+
+  useEffect(()=>{
+    if(loading==false) {
+    axios.post('http://localhost:3001/updateView', {
+                id: question[0].id,
+                update: "-"
+            })
+                .then(function (response) {
+                    console.log(response);
+
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+              }
+  },[loading])
 
 
   const parseTags = (str) => {
@@ -74,7 +95,9 @@ const Question = (props) => {
       <div>
         <div className="h3"> {question[0].title} </div>
         <div> {parseTags(question[0].tags)} </div>
-        <div className="d-flex justify-content-between text-muted"><p className="text-muted">{`Viewed ${question[0].view_count} times`}</p> <Moment fromNow>{question[0].creation_date}</Moment></div>
+        <div className="d-flex justify-content-between text-muted"><p className="text-muted">{`Viewed ${question[0].view_count+1} times`}</p> <Moment fromNow>{question[0].creation_date}</Moment></div>
+        <div className="d-flex justify-content-between text-muted">{`Answer Count ${question[0].answer_count} `} - {`Comment Count ${question[0].answer_count} `}</div>
+        {/* <div className="d-flex justify-content-between text-muted"></div> */}
         <hr></hr>
         <div> {parse(question[0].body)} </div>
 

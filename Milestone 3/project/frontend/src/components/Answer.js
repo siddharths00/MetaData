@@ -28,7 +28,9 @@ const Answer = ({ ans, userid, isAuth }) => {
         <Grid item xs={12} md={3}>
           < User id={ans.owner_user_id} creation_date={ans.creation_date} />
         </Grid>
-        <Comments id={ans.id} userid={userid} isAuth={isAuth}/>
+        <div style={{width: "85%"}}>
+          <Comments id={ans.id} userid={userid} isAuth={isAuth}/>
+        </div>
       </Grid>
     </li>);
 }

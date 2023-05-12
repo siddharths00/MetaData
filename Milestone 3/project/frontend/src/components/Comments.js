@@ -3,7 +3,7 @@ import axios from 'axios';
 import AddAnswer from './AddAnswer';
 import Comment from './Comment';
 import AddComment from './AddComment';
-const Answers = (props) => {
+const Comments = (props) => {
 
     const q_id = props.id;
     const isAuth = props.isAuth;
@@ -93,4 +93,4 @@ const Answers = (props) => {
      );
 }
  
-export default Answers;
+export default Comments;

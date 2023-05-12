@@ -6,7 +6,7 @@ import { Grid } from "@mui/material";
 import Vote from "./Vote";
 // import Comments from './Comments';
 
-const Answer = ({ ans, userid, isAuth }) => {
+const Comment = ({ ans, userid, isAuth }) => {
 
 
 
@@ -15,11 +15,12 @@ const Answer = ({ ans, userid, isAuth }) => {
   const [upvoteDisabled, setUpvoteDisabled] = useState(false);
   const [downvoteDisabled, setDownvoteDisabled] = useState(false);
 
-
+  // console.log(ans, "=====Comment");
   return (
     <li key={ans.id} className='list-group-item'>
       <div>{parse(ans.text)}</div>
-      < Grid container spacing={2}>
+      {/* {console.log(ans.id, "$$$$ Inside comment")} */}
+      < Grid container spacing={2} xs={12}>
 
         <Grid item xs={12} md={9} sx={{ alignSelf: 'end', marginBottom: 1 }}>
           {isAuth ? < Vote postid={ans.id} userid={userid} setScore={setScore} score={score} upvoteDisabled={upvoteDisabled} setUpvoteDisabled={setUpvoteDisabled} setDownvoteDisabled={setDownvoteDisabled} downvoteDisabled={downvoteDisabled} /> : null}
@@ -32,4 +33,4 @@ const Answer = ({ ans, userid, isAuth }) => {
     </li>);
 }
 
-export default Answer;
+export default Comment;
